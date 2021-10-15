@@ -104,7 +104,6 @@ class MoveNet(private val interpreter: Interpreter, private var gpuDelegate: Gpu
     private var outputShape: IntArray = interpreter.getOutputTensor(0).shape()
     // result shape from output tensor (array)
 
-
     // 얘를 거리계산 함수로 바꾸면 될듯
     override fun getLeftWristRatio(bitmap: Bitmap): Person {
         if (cropRegion == null) {
@@ -203,11 +202,14 @@ class MoveNet(private val interpreter: Interpreter, private var gpuDelegate: Gpu
         var ratio = distanceFromShoulder / shoulderDist;
 
         Log.d("test", ratio.toString())
-
+        var is_in =
         return Person(
             keyPoints,
             ratio,
-            totalScore / numKeyPoints
+            keyPoints[BodyPart.RIGHT_WRIST.position].coordinate,
+            is_in_Body(keyPoints[BodyPart.RIGHT_WRIST.position].coordinate,keyPoints[BodyPart.RIGHT_ELBOW.position].coordinate,
+                keyPoints[BodyPart.LEFT_SHOULDER.position].coordinate,keyPoints[BodyPart.RIGHT_SHOULDER.position].coordinate,
+                keyPoints[BodyPart.LEFT_HIP.position].coordinate,keyPoints[BodyPart.RIGHT_HIP.position].coordinate)
         )
 //        return shoulder_dist
 
@@ -225,6 +227,22 @@ class MoveNet(private val interpreter: Interpreter, private var gpuDelegate: Gpu
 
         var dotProduct = abs(vec1.x * vec2.x + vec1.y * vec2.y);
         return dotProduct / shoulder_dist;
+    }
+    private fun CCW(var1 :PointF,var2 :PointF,var3 :PointF): Float {
+        var result = var1.x * var2.y + var2.x * var3.y + var3.x * var1.y
+        result -= (var1.y * var2.x + var2.y * var3.x + var3.y * var1.x)
+        return result
+    }
+    private fun is_in_Body(right_wrist_pos: PointF, left_elbow_pos: PointF,
+                           left_shoulder_pos: PointF, right_shoulder_pos: PointF,
+                           left_hip_pos: PointF, right_hip_pos: PointF): Boolean {
+        var result = 0
+        if(CCW(right_wrist_pos,left_elbow_pos,left_shoulder_pos) * CCW(right_wrist_pos,left_elbow_pos,right_shoulder_pos) < 0) result += 1
+        if(CCW(right_wrist_pos,left_elbow_pos,right_shoulder_pos) * CCW(right_wrist_pos,left_elbow_pos,left_hip_pos) < 0) result += 1
+        if(CCW(right_wrist_pos,left_elbow_pos,left_hip_pos) * CCW(right_wrist_pos,left_elbow_pos,right_hip_pos) < 0) result += 1
+        if(CCW(right_wrist_pos,left_elbow_pos,right_hip_pos) * CCW(right_wrist_pos,left_elbow_pos,left_shoulder_pos) < 0) result += 1
+        if(result == 1) return true
+        else return false
     }
 
     override fun close() {
