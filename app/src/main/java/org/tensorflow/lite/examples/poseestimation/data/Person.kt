@@ -18,4 +18,4 @@ package org.tensorflow.lite.examples.poseestimation.data
 
 import android.graphics.PointF
 
-data class Person(val keyPoints: List<KeyPoint>, val ratio: Float, val rignt_wrist: PointF, var is_moving: Boolean)
+data class Person(val keyPoints: List<KeyPoint>, val ratio: Float, val rignt_wrist: PointF, var is_moving: Boolean, val score: Float)
