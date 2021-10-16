@@ -14,47 +14,56 @@ import org.tensorflow.lite.examples.poseestimation.data.Note
 
 
 class makeSound {
-    private val sampleRate = 44100
+    private val sampleRate = 44100 //샘플링 정도 혹시 너무 버벅거리면 샘플링 줄이기
 
-    private var playState =true
+    private var ratio = 1.0 //비율 값
+    private var playState =true //재생중:true, 정지:false
     private var angle: Double = 0.0
     private var audioTrack: AudioTrack? = null
-    private var synthFrequency = Note.A4
+    private var startFrequency = 0.0 // 초기 주파수 값 ==> 시작점
+    private var synthFrequency = 0.0 // 시작점으로부터 시작하는 주파수 변화
     private var minSize = AudioTrack.getMinBufferSize(sampleRate,
         AudioFormat.CHANNEL_OUT_STEREO,
         AudioFormat.ENCODING_PCM_16BIT)
-    private var buffer = ShortArray(minSize)
-    private var player2 = getAudioTrack()
-    private var soundThread: Thread? = null
+    private var buffer = ShortArray(minSize)// 버퍼
+    private var player = getAudioTrack() // 소리 재생 클라스 생성
+    private var soundThread: Thread? = null //스레드
     @RequiresApi(Build.VERSION_CODES.M)
     private var soundGen = Runnable { //버퍼 생성 스레드
         Thread.currentThread().priority = Thread.MIN_PRIORITY
 
         while(playState) {
+            this.setNoteFrequencies(ratio)
             generateTone()
-            player2?.write(buffer, 0, buffer.size, WRITE_BLOCKING)
+            player?.write(buffer, 0, buffer.size, WRITE_BLOCKING)
         }
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
     private fun makeSound(){ //소리 재생
         playState = true
-        player2?.play()
+        player?.play()
         soundThread = Thread(soundGen)
         soundThread!!.start()
     }
 
     private fun stopSound(){ //소리 멈춤
         playState = false
-        player2?.stop()
+        player?.stop()
     }
 
-    private fun getNoteFrequencies(): Double { //주파수 리턴 함수
-        return synthFrequency.note
+    private fun getStartNoteFrequencies(): Double { //주파수 리턴 함수
+        return startFrequency
     }
 
+    private fun getSynthNoteFrequencies():Double{
+        return synthFrequency
+    }
+    private fun setStartFrequencies(note:Double){//ex) input(note) = (Note.C4.note) ==>파라미터
+        startFrequency = note
+    }
     private fun setNoteFrequencies(ratio:Double){ //주파수 조절 함수 : 아직 확정 못 지음
-
+        synthFrequency = startFrequency + (ratio * startFrequency)
     }
 
     private fun oscillator(amplify: Int, frequencies: Double): Double { //파형 조절 함수 amplify:진폭 frequencies:주파수
@@ -64,7 +73,7 @@ class makeSound {
     private fun generateTone(){// 버퍼 생성 함수 array에 집어넣을 값
         for (i in buffer.indices) {
             val angularFrequency: Double =
-                getNoteFrequencies() * (Math.PI) / sampleRate
+                synthFrequency * (Math.PI) / sampleRate
             buffer[i] = (Short.MAX_VALUE * oscillator(1,angle).toFloat()).toInt().toShort()
             angle += angularFrequency
         }
