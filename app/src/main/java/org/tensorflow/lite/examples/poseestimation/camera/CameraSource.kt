@@ -25,6 +25,7 @@ import org.tensorflow.lite.examples.poseestimation.ml.PoseDetector
 import java.util.*
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
+import org.tensorflow.lite.examples.poseestimation.sound.makeSound
 
 class CameraSource(
     private val surfaceView: SurfaceView,
@@ -83,6 +84,8 @@ class CameraSource(
     private var imageReaderHandler: Handler? = null
 
     private var cameraId: String = ""
+
+    private var MakeSound: makeSound? = makeSound()
 
     suspend fun initCamera() {
         camera = openCamera(cameraManager, cameraId)
@@ -264,8 +267,8 @@ class CameraSource(
         }
          **/
         /**사람의 뼈대를 그리다**/
-
         person?.let {
+            if (it.score > MIN_CONFIDENCE) MakeSound?.soundPlay(it.ratio,it.rignt_wrist,it.is_moving)
             visualize(it, bitmap)
         }
     }

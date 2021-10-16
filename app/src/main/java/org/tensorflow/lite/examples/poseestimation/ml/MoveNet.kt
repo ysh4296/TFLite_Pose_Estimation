@@ -58,7 +58,7 @@ class MoveNet(private val interpreter: Interpreter, private var gpuDelegate: Gpu
         // controls size of crop region
 
         // TFLite file names.
-//        private const val LIGHTNING_FILENAME = "movenet_lightning.tflite"
+        //private const val LIGHTNING_FILENAME = "movenet_lightning.tflite"
         private const val THUNDER_FILENAME = "movenet_thunder.tflite"
 
         // allow specifying model type.
@@ -201,7 +201,7 @@ class MoveNet(private val interpreter: Interpreter, private var gpuDelegate: Gpu
         var distanceFromShoulder = getDistanceFromShoulder(leftWristPos, leftShoulderPos, rightShoulderPos, shoulderDist);
         var ratio = distanceFromShoulder / shoulderDist;
 
-        Log.d("test", ratio.toString())
+        //Log.d("test", ratio.toString())
 
         return Person(
             keyPoints,

@@ -11,17 +11,18 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import kotlin.math.sin
 import org.tensorflow.lite.examples.poseestimation.data.Note
+import android.graphics.PointF
+import android.util.Log
 
-
-class makeSound {
+class makeSound (){
     private val sampleRate = 44100 //샘플링 정도 혹시 너무 버벅거리면 샘플링 줄이기
 
     private var ratio = 1.0 //비율 값
     private var playState =true //재생중:true, 정지:false
     private var angle: Double = 0.0
     private var audioTrack: AudioTrack? = null
-    private var startFrequency = 0.0 // 초기 주파수 값 ==> 시작점
-    private var synthFrequency = 0.0 // 시작점으로부터 시작하는 주파수 변화
+    private var startFrequency = 32.70 // 초기 주파수 값 ==> 시작점
+    private var synthFrequency = 32.70 // 시작점으로부터 시작하는 주파수 변화
     private var minSize = AudioTrack.getMinBufferSize(sampleRate,
         AudioFormat.CHANNEL_OUT_STEREO,
         AudioFormat.ENCODING_PCM_16BIT)
@@ -38,6 +39,8 @@ class makeSound {
             player?.write(buffer, 0, buffer.size, WRITE_BLOCKING)
         }
     }
+    private var Right_Wrist: PointF = PointF(0.0F,0.0F)
+
 
     @RequiresApi(Build.VERSION_CODES.M)
     private fun makeSound(){ //소리 재생
@@ -91,5 +94,14 @@ class makeSound {
             .setBufferSizeInBytes(minSize)
             .build()
         return audioTrack
+    }
+
+    fun soundPlay(ratio: Float,right_wrist: PointF,is_in_body: Boolean){
+        var distance = Math.pow((right_wrist.x - Right_Wrist.x).toDouble(), 2.0) + Math.pow((right_wrist.y - Right_Wrist.y).toDouble(),2.0)
+        if(distance > 100) {
+            Log.d("test", distance.toString())
+            makeSound()
+        }
+        Right_Wrist = right_wrist
     }
 }
