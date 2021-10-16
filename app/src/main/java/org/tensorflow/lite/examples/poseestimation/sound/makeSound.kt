@@ -21,8 +21,8 @@ class makeSound (){
     private var playState =true //재생중:true, 정지:false
     private var angle: Double = 0.0
     private var audioTrack: AudioTrack? = null
-    private var startFrequency = 32.70 // 초기 주파수 값 ==> 시작점
-    private var synthFrequency = 32.70 // 시작점으로부터 시작하는 주파수 변화
+    private var startFrequency = 130.81 // 초기 주파수 값 ==> 시작점
+    private var synthFrequency = 130.81 // 시작점으로부터 시작하는 주파수 변화
     private var minSize = AudioTrack.getMinBufferSize(sampleRate,
         AudioFormat.CHANNEL_OUT_STEREO,
         AudioFormat.ENCODING_PCM_16BIT)
@@ -98,10 +98,12 @@ class makeSound (){
 
     fun soundPlay(ratio: Float,right_wrist: PointF,is_in_body: Boolean){
         var distance = Math.pow((right_wrist.x - Right_Wrist.x).toDouble(), 2.0) + Math.pow((right_wrist.y - Right_Wrist.y).toDouble(),2.0)
-        if(distance > 100) {
+        Log.d("test", is_in_body.toString())
+        if(is_in_body && !playState) {
             Log.d("test", distance.toString())
+            setNoteFrequencies(ratio.toDouble())
             makeSound()
-        } else {
+        } else if(!is_in_body && playState){
             stopSound()
         }
         Right_Wrist = right_wrist
