@@ -16,8 +16,6 @@ import android.util.Log
 
 class makeSound (){
     private val sampleRate = 44100 //샘플링 정도 혹시 너무 버벅거리면 샘플링 줄이기
-
-    private var ratio = 1.0 //비율 값
     private var playState =true //재생중:true, 정지:false
     private var angle: Double = 0.0
     private var audioTrack: AudioTrack? = null
@@ -32,9 +30,7 @@ class makeSound (){
     @RequiresApi(Build.VERSION_CODES.M)
     private var soundGen = Runnable { //버퍼 생성 스레드
         Thread.currentThread().priority = Thread.MIN_PRIORITY
-
         while(playState) {
-            this.setNoteFrequencies(ratio)
             generateTone()
             player?.write(buffer, 0, buffer.size, WRITE_BLOCKING)
         }
@@ -98,11 +94,12 @@ class makeSound (){
 
     fun soundPlay(ratio: Float,right_wrist: PointF,is_in_body: Boolean){
         var distance = Math.pow((right_wrist.x - Right_Wrist.x).toDouble(), 2.0) + Math.pow((right_wrist.y - Right_Wrist.y).toDouble(),2.0)
-        Log.d("test", is_in_body.toString())
+        Log.d("test", ratio.toString())
         if(is_in_body && !playState) {
             Log.d("test", distance.toString())
             setNoteFrequencies(ratio.toDouble())
             makeSound()
+
         } else if(!is_in_body && playState){
             stopSound()
         }
