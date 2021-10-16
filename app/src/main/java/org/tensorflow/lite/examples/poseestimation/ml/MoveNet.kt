@@ -206,9 +206,11 @@ class MoveNet(private val interpreter: Interpreter, private var gpuDelegate: Gpu
             keyPoints,
             ratio,
             keyPoints[BodyPart.RIGHT_WRIST.position].coordinate,
-            is_in_Body(keyPoints[BodyPart.RIGHT_WRIST.position].coordinate,keyPoints[BodyPart.RIGHT_ELBOW.position].coordinate,
+            true,
+            /**is_in_Body(keyPoints[BodyPart.RIGHT_WRIST.position].coordinate,keyPoints[BodyPart.RIGHT_ELBOW.position].coordinate,
                 keyPoints[BodyPart.LEFT_SHOULDER.position].coordinate,keyPoints[BodyPart.RIGHT_SHOULDER.position].coordinate,
                 keyPoints[BodyPart.LEFT_HIP.position].coordinate,keyPoints[BodyPart.RIGHT_HIP.position].coordinate),
+            **/
             totalScore / numKeyPoints
         )
 //        return shoulder_dist
@@ -228,6 +230,7 @@ class MoveNet(private val interpreter: Interpreter, private var gpuDelegate: Gpu
         var dotProduct = abs(vec1.x * vec2.x + vec1.y * vec2.y);
         return dotProduct / shoulder_dist;
     }
+
     private fun CCW(var1 :PointF,var2 :PointF,var3 :PointF): Float {
         var result = var1.x * var2.y + var2.x * var3.y + var3.x * var1.y
         result -= (var1.y * var2.x + var2.y * var3.x + var3.y * var1.x)
