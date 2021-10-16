@@ -101,6 +101,8 @@ class makeSound (){
         if(distance > 100) {
             Log.d("test", distance.toString())
             makeSound()
+        } else {
+            stopSound()
         }
         Right_Wrist = right_wrist
     }
