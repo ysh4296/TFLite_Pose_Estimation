@@ -200,7 +200,6 @@ class MoveNet(private val interpreter: Interpreter, private var gpuDelegate: Gpu
         var shoulderDist = getDistance(leftShoulderPos, rightShoulderPos);
         var distanceFromShoulder = getDistanceFromShoulder(leftWristPos, leftShoulderPos, rightShoulderPos, shoulderDist);
         var ratio = distanceFromShoulder / shoulderDist;
-
         //Log.d("test", ratio.toString())
 
         return Person(
@@ -232,16 +231,23 @@ class MoveNet(private val interpreter: Interpreter, private var gpuDelegate: Gpu
     private fun CCW(var1 :PointF,var2 :PointF,var3 :PointF): Float {
         var result = var1.x * var2.y + var2.x * var3.y + var3.x * var1.y
         result -= (var1.y * var2.x + var2.y * var3.x + var3.y * var1.x)
+        if(result < 0) result = -1.0F
+        else if( result > 0) result = 1.0F
         return result
     }
-    private fun is_in_Body(right_wrist_pos: PointF, left_elbow_pos: PointF,
+    private fun is_in_Body(right_wrist_pos: PointF, right_elbow_pos: PointF,
                            left_shoulder_pos: PointF, right_shoulder_pos: PointF,
                            left_hip_pos: PointF, right_hip_pos: PointF): Boolean {
         var result = 0
-        if(CCW(right_wrist_pos,left_elbow_pos,left_shoulder_pos) * CCW(right_wrist_pos,left_elbow_pos,right_shoulder_pos) < 0) result += 1
-        if(CCW(right_wrist_pos,left_elbow_pos,right_shoulder_pos) * CCW(right_wrist_pos,left_elbow_pos,left_hip_pos) < 0) result += 1
-        if(CCW(right_wrist_pos,left_elbow_pos,left_hip_pos) * CCW(right_wrist_pos,left_elbow_pos,right_hip_pos) < 0) result += 1
-        if(CCW(right_wrist_pos,left_elbow_pos,right_hip_pos) * CCW(right_wrist_pos,left_elbow_pos,left_shoulder_pos) < 0) result += 1
+        if(CCW(right_wrist_pos,left_shoulder_pos,right_elbow_pos) * CCW(right_wrist_pos,right_shoulder_pos,right_elbow_pos) < 0
+            && CCW(left_shoulder_pos,right_wrist_pos,right_shoulder_pos) * CCW(left_shoulder_pos,right_elbow_pos,right_shoulder_pos) < 0) result += 1
+        if(CCW(right_wrist_pos,right_shoulder_pos,right_elbow_pos) * CCW(right_wrist_pos,right_hip_pos,right_elbow_pos) < 0
+            && CCW(right_shoulder_pos,right_wrist_pos,right_hip_pos) * CCW(right_shoulder_pos,right_elbow_pos,right_hip_pos) < 0) result += 1
+        if(CCW(right_wrist_pos,right_hip_pos,right_elbow_pos) * CCW(right_wrist_pos,left_hip_pos,right_elbow_pos) < 0
+            && CCW(right_hip_pos,right_wrist_pos,left_hip_pos) * CCW(right_hip_pos,right_elbow_pos,left_hip_pos) < 0) result += 1
+        if(CCW(right_wrist_pos,left_hip_pos,right_elbow_pos) * CCW(right_wrist_pos,left_shoulder_pos,right_elbow_pos) < 0
+            && CCW(left_hip_pos,right_wrist_pos,left_shoulder_pos) * CCW(left_hip_pos,right_elbow_pos,left_shoulder_pos) < 0) result += 1
+        Log.d("test", result.toString())
         if(result == 1) return true
         else return false
     }
@@ -424,7 +430,6 @@ class MoveNet(private val interpreter: Interpreter, private var gpuDelegate: Gpu
             if (keyPoints[joint].score < MIN_CROP_KEYPOINT_SCORE) continue
             val distY = abs(centerY - keyPoints[joint].coordinate.y)
             val distX = abs(centerX - keyPoints[joint].coordinate.x)
-
             if (distY > maxBodyYRange) maxBodyYRange = distY
             if (distX > maxBodyXRange) maxBodyXRange = distX
         }

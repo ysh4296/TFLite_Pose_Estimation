@@ -98,10 +98,11 @@ class makeSound (){
 
     fun soundPlay(ratio: Float,right_wrist: PointF,is_in_body: Boolean){
         var distance = Math.pow((right_wrist.x - Right_Wrist.x).toDouble(), 2.0) + Math.pow((right_wrist.y - Right_Wrist.y).toDouble(),2.0)
-        if(distance > 100) {
+        Log.d("test", is_in_body.toString())
+        if(is_in_body && !playState) {
             Log.d("test", distance.toString())
             makeSound()
-        } else {
+        } else if(!is_in_body && playState){
             stopSound()
         }
         Right_Wrist = right_wrist

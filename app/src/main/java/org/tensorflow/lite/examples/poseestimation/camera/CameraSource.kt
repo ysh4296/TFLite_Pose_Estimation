@@ -268,7 +268,7 @@ class CameraSource(
          **/
         /**사람의 뼈대를 그리다**/
         person?.let {
-            if (it.score > MIN_CONFIDENCE) MakeSound?.soundPlay(it.ratio,it.rignt_wrist,it.is_moving)
+            if (it.score > MIN_CONFIDENCE) MakeSound?.soundPlay(it.ratio,it.rignt_wrist,it.is_in)
             visualize(it, bitmap)
         }
     }
@@ -321,7 +321,7 @@ class CameraSource(
             imageReaderThread = null
             imageReaderHandler = null
         } catch (e: InterruptedException) {
-            Log.d(TAG, e.message.toString())
+            //.d(TAG, e.message.toString())
         }
     }
 }
