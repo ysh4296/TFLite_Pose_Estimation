@@ -15,7 +15,7 @@ import android.graphics.PointF
 import android.util.Log
 
 class makeSound (){
-    private val sampleRate = 22050//44100 //샘플링 정도 혹시 너무 버벅거리면 샘플링 줄이기
+    private val sampleRate = 44100 //샘플링 정도 혹시 너무 버벅거리면 샘플링 줄이기
     private var playState =true //재생중:true, 정지:false
     private var angle: Double = 0.0
     private var audioTrack: AudioTrack? = null
@@ -62,7 +62,7 @@ class makeSound (){
         startFrequency = note
     }
     private fun setNoteFrequencies(ratio:Double){ //주파수 조절 함수 : 아직 확정 못 지음
-        synthFrequency = startFrequency + (ratio * (startFrequency)*0.5)
+        synthFrequency = startFrequency + (ratio * startFrequency)
     }
 
     private fun oscillator(amplify: Int, frequencies: Double): Double { //파형 조절 함수 amplify:진폭 frequencies:주파수
@@ -95,11 +95,11 @@ class makeSound (){
     fun soundPlay(ratio: Float,right_wrist: PointF,is_in_body: Boolean){
         var distance = Math.pow((right_wrist.x - Right_Wrist.x).toDouble(), 2.0) + Math.pow((right_wrist.y - Right_Wrist.y).toDouble(),2.0)
         Log.d("test", ratio.toString())
-        if(distance > 200) {
+        if(is_in_body) {
             Log.d("test", distance.toString())
             setNoteFrequencies(ratio.toDouble())
             if(!playState) makeSound()
-        } else if(distance <= 200 && playState){
+        } else if(!is_in_body && playState){
             stopSound()
         }
         Right_Wrist = right_wrist
